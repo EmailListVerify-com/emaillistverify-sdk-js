@@ -1,314 +1,208 @@
-# EmailListVerify TypeScript SDK
+# EmailListVerify SDK for JavaScript/TypeScript
 
-A comprehensive TypeScript/JavaScript SDK for the EmailListVerify API, providing email verification services with full type safety.
-
-## Features
-
-- ✅ **Full TypeScript support** with comprehensive type definitions
-- 🚀 **Simple and intuitive API** - easy to integrate
-- 📧 **Single email verification** - verify individual email addresses
-- 📊 **Bulk verification** - process large lists of emails efficiently
-- 📁 **CSV file processing** - upload and process CSV files
-- 🔄 **Progress tracking** - monitor bulk verification progress
-- ⚡ **Rate limiting** - built-in protection against API limits
-- 🛡️ **Error handling** - comprehensive error management
-- 📝 **Detailed responses** - get comprehensive verification data
+Official JavaScript/TypeScript SDK for the EmailListVerify API - Email validation and verification service.
 
 ## Installation
 
 ```bash
 npm install emaillistverify-sdk
+# or
+yarn add emaillistverify-sdk
+# or
+pnpm add emaillistverify-sdk
 ```
 
 ## Quick Start
 
-```typescript
-import { EmailListVerifyClient } from 'emaillistverify-sdk';
+```javascript
+import EmailListVerify from 'emaillistverify-sdk';
+// or for CommonJS
+// const EmailListVerify = require('emaillistverify-sdk');
 
-const client = new EmailListVerifyClient('YOUR_API_KEY');
+const client = new EmailListVerify('YOUR_API_KEY');
 
-// Verify single email
+// Verify a single email
 const result = await client.verifyEmail('test@example.com');
-console.log(result.status); // 'ok', 'failed', 'unknown', or 'error'
+console.log(result);
+// {
+//   email: 'test@example.com',
+//   result: 'ok',
+//   isValid: true,
+//   isDisposable: false,
+//   isRole: false,
+//   isCatchAll: false
+// }
 
 // Verify multiple emails
-const emails = ['email1@example.com', 'email2@example.com'];
-const results = await client.verifyBatch(emails);
+const bulkResult = await client.verifyBulk([
+  'valid@gmail.com',
+  'invalid@fake.com',
+  'info@example.com'
+]);
+console.log(bulkResult);
+// {
+//   results: [...],
+//   processed: 3,
+//   valid: 1,
+//   invalid: 2
+// }
+```
+
+## TypeScript Support
+
+This SDK includes full TypeScript support with type definitions:
+
+```typescript
+import EmailListVerify, { 
+  EmailVerificationResult,
+  EmailVerificationResponse,
+  BulkVerificationResponse,
+  EmailListVerifyError
+} from 'emaillistverify-sdk';
+
+const client = new EmailListVerify('YOUR_API_KEY');
+
+try {
+  const result: EmailVerificationResponse = await client.verifyEmail('test@example.com');
+  
+  if (result.isValid) {
+    console.log('Email is valid!');
+  }
+  
+  if (result.isDisposable) {
+    console.log('Email is disposable');
+  }
+} catch (error) {
+  if (error instanceof EmailListVerifyError) {
+    console.error(`Error: ${error.message}, Code: ${error.code}`);
+  }
+}
 ```
 
 ## API Reference
 
-### EmailListVerifyClient
-
-#### Constructor
+### Constructor
 
 ```typescript
-new EmailListVerifyClient(apiKey: string, options?: EmailListVerifyOptions)
+new EmailListVerify(apiKey: string, options?: { baseUrl?: string })
 ```
 
-- `apiKey`: Your EmailListVerify API key
-- `options.timeout`: Request timeout in milliseconds (default: 30000)
+- `apiKey` - Your EmailListVerify API key (required)
+- `options.baseUrl` - Custom API base URL (optional)
 
-#### Methods
+### Methods
 
-##### `verifyEmail(email: string): Promise<VerificationResult>`
+#### `verifyEmail(email: string): Promise<EmailVerificationResponse>`
 
-Verify a single email address.
+Verifies a single email address.
 
+**Returns:**
 ```typescript
-const result = await client.verifyEmail('test@example.com');
-console.log(result);
-// {
-//   email: 'test@example.com',
-//   status: 'ok',
-//   timestamp: '2023-07-01T12:00:00.000Z'
-// }
-```
-
-##### `verifyEmailDetailed(email: string): Promise<DetailedVerificationResult>`
-
-Get detailed verification information.
-
-```typescript
-const result = await client.verifyEmailDetailed('test@example.com');
-console.log(result);
-// {
-//   email: 'test@example.com',
-//   status: 'ok',
-//   timestamp: '2023-07-01T12:00:00.000Z',
-//   disposable: false,
-//   role: false,
-//   free: true,
-//   syntax: true,
-//   dns: true,
-//   mx: true,
-//   smtp: true
-// }
-```
-
-##### `verifyBatch(emails: string[], maxBatchSize?: number): Promise<VerificationResult[]>`
-
-Verify multiple emails in batches.
-
-```typescript
-const emails = ['email1@example.com', 'email2@example.com'];
-const results = await client.verifyBatch(emails);
-results.forEach(result => {
-  console.log(`${result.email}: ${result.status}`);
-});
-```
-
-##### `bulkUpload(filePath: string, filename?: string): Promise<string>`
-
-Upload a CSV file for bulk verification.
-
-```typescript
-const fileId = await client.bulkUpload('emails.csv');
-console.log('File uploaded:', fileId);
-```
-
-##### `getBulkStatus(fileId: string): Promise<BulkStatus>`
-
-Check the status of a bulk verification job.
-
-```typescript
-const status = await client.getBulkStatus(fileId);
-console.log(`Progress: ${status.progress}%`);
-```
-
-##### `downloadBulkResult(fileId: string, resultType?: 'all' | 'clean'): Promise<string>`
-
-Download bulk verification results.
-
-```typescript
-const results = await client.downloadBulkResult(fileId, 'all');
-// Save results to file
-await fs.writeFile('results.csv', results);
-```
-
-##### `waitForBulkCompletion(fileId: string, options?: WaitOptions): Promise<BulkStatus>`
-
-Wait for bulk verification to complete with progress tracking.
-
-```typescript
-const finalStatus = await client.waitForBulkCompletion(fileId, {
-  checkInterval: 10,
-  maxWait: 3600,
-  onProgress: (status) => {
-    console.log(`Progress: ${status.progress}%`);
-  }
-});
-```
-
-##### `getCredits(): Promise<CreditsInfo>`
-
-Get account credits information.
-
-```typescript
-const credits = await client.getCredits();
-console.log(`Available credits: ${credits.credits}`);
-```
-
-### EmailValidator
-
-Static utility methods for email validation.
-
-```typescript
-import { EmailValidator } from 'emaillistverify-sdk';
-
-// Check syntax
-EmailValidator.isValidSyntax('test@example.com'); // true
-
-// Extract domain
-EmailValidator.extractDomain('test@example.com'); // 'example.com'
-
-// Extract username
-EmailValidator.extractUsername('test@example.com'); // 'test'
-
-// Check if disposable
-EmailValidator.isDisposableDomain('tempmail.com'); // true
-
-// Check if role email
-EmailValidator.isRoleEmail('admin@company.com'); // true
-
-// Normalize email
-EmailValidator.normalize('  Test@EXAMPLE.COM  '); // 'test@example.com'
-```
-
-### BulkVerificationManager
-
-High-level manager for bulk operations.
-
-```typescript
-import { BulkVerificationManager } from 'emaillistverify-sdk';
-
-const manager = new BulkVerificationManager(client);
-
-// Process CSV file with progress tracking
-const jobInfo = await manager.processCsvFile(
-  'input.csv',
-  'output.csv',
-  true, // wait for completion
-  (status) => console.log(`Progress: ${status.progress}%`)
-);
-```
-
-## Type Definitions
-
-### VerificationStatus
-
-```typescript
-type VerificationStatus = 'ok' | 'failed' | 'unknown' | 'error';
-```
-
-### VerificationResult
-
-```typescript
-interface VerificationResult {
+{
   email: string;
-  status: VerificationStatus;
-  timestamp: string;
-  error?: string;
+  result: EmailVerificationResult;
+  isValid: boolean;
+  isDisposable: boolean;
+  isRole: boolean;
+  isCatchAll: boolean;
 }
 ```
 
-### DetailedVerificationResult
+#### `verifyBulk(emails: string[]): Promise<BulkVerificationResponse>`
 
+Verifies multiple email addresses in bulk.
+
+**Returns:**
 ```typescript
-interface DetailedVerificationResult extends VerificationResult {
-  reason?: string;
-  disposable?: boolean;
-  role?: boolean;
-  free?: boolean;
-  syntax?: boolean;
-  dns?: boolean;
-  mx?: boolean;
-  smtp?: boolean;
-  catch_all?: boolean;
-  score?: number;
-  user?: string;
-  domain?: string;
+{
+  results: EmailVerificationResponse[];
+  processed: number;
+  valid: number;
+  invalid: number;
 }
 ```
 
-### BulkStatus
+#### `getCredits(): Promise<number | null>`
 
-```typescript
-interface BulkStatus {
-  file_id: string;
-  status: 'processing' | 'completed' | 'failed' | 'queued';
-  progress?: number;
-  total?: number;
-  processed?: number;
-  valid?: number;
-  invalid?: number;
-  unknown?: number;
-  error?: string;
-  created_at?: string;
-  completed_at?: string;
-}
-```
+Gets remaining API credits.
 
-## Error Handling
+### Result Types
 
-The SDK provides proper error handling with typed exceptions:
+The `result` field can be one of:
+- `ok` - Email is valid
+- `invalid` - Email format is invalid
+- `invalid_mx` - Domain has invalid MX records
+- `accept_all` / `ok_for_all` - Server accepts all emails (catch-all)
+- `disposable` - Temporary/disposable email
+- `role` - Role-based email (info@, admin@, etc.)
+- `email_disabled` - Email is disabled
+- `dead_server` - Mail server not responding
+- `unknown` - Unable to verify
 
-```typescript
-import { EmailListVerifyException } from 'emaillistverify-sdk';
+### Error Handling
 
+The SDK throws `EmailListVerifyError` for API errors:
+
+```javascript
 try {
   const result = await client.verifyEmail('test@example.com');
 } catch (error) {
-  if (error instanceof EmailListVerifyException) {
-    console.error('API Error:', error.message);
-  } else {
-    console.error('Unexpected error:', error);
+  if (error instanceof EmailListVerifyError) {
+    switch (error.code) {
+      case 'AUTH_ERROR':
+        console.error('Invalid API key');
+        break;
+      case 'RATE_LIMIT':
+        console.error('Rate limit exceeded');
+        break;
+      case 'API_ERROR':
+        console.error('API error:', error.message);
+        break;
+    }
   }
 }
-```
-
-## Development
-
-### Building
-
-```bash
-npm run build
-```
-
-### Testing
-
-```bash
-npm test
-```
-
-### Linting
-
-```bash
-npm run lint
-```
-
-### Type Checking
-
-```bash
-npm run typecheck
 ```
 
 ## Examples
 
-Check the `examples/` directory for comprehensive usage examples:
+### Check if email is safe to send
 
-- Single email verification
-- Batch processing
-- Bulk file processing
-- Progress tracking
-- Error handling
-- Stream processing
-- Multiple job management
+```javascript
+const result = await client.verifyEmail('user@example.com');
+
+if (result.isValid && !result.isDisposable && !result.isRole) {
+  // Safe to send
+  console.log('Email is safe to send to');
+} else {
+  // Not recommended
+  console.log('Email may have deliverability issues');
+}
+```
+
+### Bulk verification with filtering
+
+```javascript
+const emails = [
+  'user1@gmail.com',
+  'user2@tempmail.com',
+  'admin@company.com'
+];
+
+const bulkResult = await client.verifyBulk(emails);
+
+const validEmails = bulkResult.results
+  .filter(r => r.isValid && !r.isDisposable)
+  .map(r => r.email);
+
+console.log('Valid emails:', validEmails);
+```
+
+## Support
+
+- Documentation: https://emaillistverify.com/docs
+- Issues: https://github.com/emaillistverify/emaillistverify-sdk-js/issues
+- Email: support@emaillistverify.com
 
 ## License
 
 MIT
-
-## Support
-
-For support, please contact support@emaillistverify.com or visit our [documentation](https://emaillistverify.com/docs/).
