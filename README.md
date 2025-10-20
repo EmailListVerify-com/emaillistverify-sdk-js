@@ -5,19 +5,19 @@ Official JavaScript/TypeScript SDK for the EmailListVerify API - Email validatio
 ## Installation
 
 ```bash
-npm install @devcyberpanda/emaillistverify-sdk
+npm install @emaillistverify/sdk
 # or
-yarn add @devcyberpanda/emaillistverify-sdk
+yarn add @emaillistverify/sdk
 # or
-pnpm add @devcyberpanda/emaillistverify-sdk
+pnpm add @emaillistverify/sdk
 ```
 
 ## Quick Start
 
 ```javascript
-import EmailListVerify from '@devcyberpanda/emaillistverify-sdk';
+import EmailListVerify from '@emaillistverify/sdk';
 // or for CommonJS
-// const EmailListVerify = require('@devcyberpanda/emaillistverify-sdk');
+// const EmailListVerify = require('@emaillistverify/sdk');
 
 const client = new EmailListVerify('YOUR_API_KEY');
 
@@ -53,12 +53,12 @@ console.log(bulkResult);
 This SDK includes full TypeScript support with type definitions:
 
 ```typescript
-import EmailListVerify, { 
+import EmailListVerify, {
   EmailVerificationResult,
   EmailVerificationResponse,
   BulkVerificationResponse,
   EmailListVerifyError
-} from '@devcyberpanda/emaillistverify-sdk';
+} from '@emaillistverify/sdk';
 
 const client = new EmailListVerify('YOUR_API_KEY');
 

@@ -1,6 +1,6 @@
 {
-  "name": "@devcyberpanda/emaillistverify-sdk",
-  "version": "0.1.0",
+  "name": "@emaillistverify/sdk",
+  "version": "0.1.2",
   "description": "Official TypeScript SDK wrapper for the EmailListVerify API.",
   "type": "module",
   "main": "dist/index.cjs",
