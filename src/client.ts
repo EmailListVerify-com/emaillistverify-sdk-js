@@ -20,6 +20,7 @@ import type {
 } from './types';
 import { HttpClient, createHttpClient } from './utils/http';
 import { ValidationError } from './utils/errors';
+import { VERSION } from './version';
 
 /**
  * Default configuration values
@@ -50,10 +51,17 @@ export class EmailListVerifyClient {
       throw new ValidationError('API key is required and must be a non-empty string', 'apiKey');
     }
 
+    // Build User-Agent header
+    const userAgent = this.buildUserAgent();
+
     this.http = createHttpClient({
       apiKey: apiKey.trim(),
       baseUrl: options?.baseUrl || DEFAULT_BASE_URL,
       timeout: options?.timeout || DEFAULT_TIMEOUT,
+      headers: {
+        'User-Agent': userAgent,
+        ...options?.headers, // Custom headers override defaults
+      },
     });
   }
 
@@ -211,9 +219,12 @@ export class EmailListVerifyClient {
   async checkDisposable(domain: string): Promise<CheckDisposableResponse> {
     this.validateRequired(domain, 'domain');
 
-    const response = await this.http.post<CheckDisposableResponse>('/api/checkDisposable', {
-      domain,
-    });
+    // Note: API uses POST method with query parameter (unusual pattern)
+    const response = await this.http.post<CheckDisposableResponse>(
+      '/api/checkDisposable',
+      undefined, // No request body
+      { domain } // Query parameter
+    );
     return response.data;
   }
 
@@ -242,10 +253,11 @@ export class EmailListVerifyClient {
     const formData = new FormData();
 
     // Handle both Blob (browser) and Buffer (Node.js)
+    // Note: API expects field name 'file_contents' (snake_case)
     if (file instanceof Buffer) {
-      formData.append('file', new Blob([file]), filename);
+      formData.append('file_contents', new Blob([file]), filename);
     } else {
-      formData.append('file', file, filename);
+      formData.append('file_contents', file, filename);
     }
 
     const response = await this.http.postFormData<BulkUploadResponse>(
@@ -399,5 +411,17 @@ export class EmailListVerifyClient {
     if (value === undefined || value === null || value === '') {
       throw new ValidationError(`${fieldName} is required`, fieldName);
     }
+  }
+
+  /**
+   * Build User-Agent header
+   */
+  private buildUserAgent(): string {
+    const runtime =
+      typeof process !== 'undefined' && process.versions?.node
+        ? `Node.js/${process.version}`
+        : 'Browser';
+
+    return `emaillistverify-sdk-js/${VERSION} (${runtime})`;
   }
 }

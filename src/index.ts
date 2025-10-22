@@ -5,7 +5,7 @@
  * @packageDocumentation
  */
 
-export const VERSION = '1.0.0';
+export { VERSION } from './version';
 
 // Export main client
 export { EmailListVerifyClient } from './client';

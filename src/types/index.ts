@@ -380,6 +380,8 @@ export interface ClientConfig {
   baseUrl?: string;
   /** Request timeout in milliseconds (default: 30000) */
   timeout?: number;
+  /** Additional headers to include in all requests */
+  headers?: Record<string, string>;
 }
 
 // ============================================================================
