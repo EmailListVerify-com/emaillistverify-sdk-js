@@ -45,6 +45,7 @@ npm install emaillistverify-sdk-js
 ```
 
 **Requirements:**
+
 - Node.js 20+ (uses native `fetch` API)
 - TypeScript 5.x (optional, for TypeScript projects)
 
@@ -86,11 +87,11 @@ Simple email verification - checks email validity, disposable status, and more.
 ```javascript
 const result = await client.verifyEmail('john.doe@example.com');
 
-console.log(result.result);       // 'ok' | 'invalid' | 'unknown' | etc.
-console.log(result.disposable);   // true/false - is disposable email?
-console.log(result.free);         // true/false - free email provider?
-console.log(result.role);         // true/false - role-based email?
-console.log(result.didYouMean);   // Suggested correction or null
+console.log(result.result); // 'ok' | 'invalid' | 'unknown' | etc.
+console.log(result.disposable); // true/false - is disposable email?
+console.log(result.free); // true/false - free email provider?
+console.log(result.role); // true/false - role-based email?
+console.log(result.didYouMean); // Suggested correction or null
 ```
 
 **💳 Credits:** See [pricing documentation](https://emaillistverify.com/pricing)
@@ -104,15 +105,15 @@ Detailed verification with SMTP check and additional metadata.
 ```javascript
 const result = await client.verifyEmailDetailed('ceo@company.com');
 
-console.log(result.result);       // Verification result
-console.log(result.smtp_check);   // SMTP server response
-console.log(result.mx_found);     // MX records found?
-console.log(result.accept_all);   // Server accepts all emails?
-console.log(result.catch_all);    // Catch-all domain?
-console.log(result.firstName);    // First name (if detected)
-console.log(result.lastName);     // Last name (if detected)
-console.log(result.gender);       // Gender (if detected)
-console.log(result.country);      // Country (if detected)
+console.log(result.result); // Verification result
+console.log(result.smtp_check); // SMTP server response
+console.log(result.mx_found); // MX records found?
+console.log(result.accept_all); // Server accepts all emails?
+console.log(result.catch_all); // Catch-all domain?
+console.log(result.firstName); // First name (if detected)
+console.log(result.lastName); // Last name (if detected)
+console.log(result.gender); // Gender (if detected)
+console.log(result.country); // Country (if detected)
 ```
 
 **💳 Credits:** See [pricing documentation](https://emaillistverify.com/pricing)
@@ -133,9 +134,9 @@ const job = await client.createEmailJob({
   quality: 'standard', // 'standard' or 'high'
 });
 
-console.log(job.id);         // Job ID for status checking
-console.log(job.status);     // 'pending' | 'processing' | 'finished' | 'failed'
-console.log(job.createdAt);  // ISO timestamp
+console.log(job.id); // Job ID for status checking
+console.log(job.status); // 'pending' | 'processing' | 'finished' | 'failed'
+console.log(job.createdAt); // ISO timestamp
 ```
 
 ---
@@ -147,11 +148,11 @@ Check the status of an async job.
 ```javascript
 const status = await client.getEmailJob('job-12345');
 
-console.log(status.status);      // Job status
-console.log(status.finishedAt);  // Completion time (if finished)
+console.log(status.status); // Job status
+console.log(status.finishedAt); // Completion time (if finished)
 
 if (status.status === 'finished') {
-  console.log(status.result);    // EmailVerificationResult
+  console.log(status.result); // EmailVerificationResult
 }
 ```
 
@@ -168,17 +169,17 @@ Find contact email addresses by name and domain.
 ```javascript
 const result = await client.findContact({
   firstName: 'John',
-  lastName: 'Doe',  // optional
+  lastName: 'Doe', // optional
   domain: 'example.com',
 });
 
-console.log(result.emails.length);  // Number of contacts found
+console.log(result.emails.length); // Number of contacts found
 
-result.emails.forEach(contact => {
-  console.log(contact.email);      // Email address
-  console.log(contact.firstName);  // First name
-  console.log(contact.lastName);   // Last name
-  console.log(contact.position);   // Job title/position
+result.emails.forEach((contact) => {
+  console.log(contact.email); // Email address
+  console.log(contact.firstName); // First name
+  console.log(contact.lastName); // Last name
+  console.log(contact.position); // Job title/position
 });
 ```
 
@@ -197,9 +198,9 @@ Check if a domain is a disposable/temporary email provider.
 ```javascript
 const result = await client.checkDisposable('tempmail.com');
 
-console.log(result.domain);      // 'tempmail.com'
-console.log(result.disposable);  // true
-console.log(result.reason);      // 'Known disposable email provider'
+console.log(result.domain); // 'tempmail.com'
+console.log(result.disposable); // true
+console.log(result.reason); // 'Known disposable email provider'
 ```
 
 **💳 Credits:** See [pricing documentation](https://emaillistverify.com/pricing)
@@ -218,12 +219,13 @@ import { readFileSync } from 'fs';
 const fileBuffer = readFileSync('./emails.csv');
 const upload = await client.uploadBulkFile(fileBuffer, 'emails.csv');
 
-console.log(upload.fileId);    // File ID for tracking
-console.log(upload.status);    // 'processing'
-console.log(upload.fileName);  // Original filename
+console.log(upload.fileId); // File ID for tracking
+console.log(upload.status); // 'processing'
+console.log(upload.fileName); // Original filename
 ```
 
 **CSV Format:**
+
 ```csv
 email
 john@example.com
@@ -240,11 +242,11 @@ Check bulk processing progress.
 ```javascript
 const progress = await client.getBulkProgress('file-12345');
 
-console.log(progress.status);      // 'processing' | 'finished' | 'error'
-console.log(progress.progress);    // Percentage (0-100)
-console.log(progress.total);       // Total emails in file
-console.log(progress.processed);   // Emails processed so far
-console.log(progress.unique);      // Unique emails found
+console.log(progress.status); // 'processing' | 'finished' | 'error'
+console.log(progress.progress); // Percentage (0-100)
+console.log(progress.total); // Total emails in file
+console.log(progress.processed); // Emails processed so far
+console.log(progress.unique); // Unique emails found
 ```
 
 ---
@@ -313,22 +315,22 @@ The SDK provides 13 specialized error classes for comprehensive error handling.
 
 ```typescript
 import {
-  EmailListVerifyError,        // Base error class
-  AuthenticationError,          // 401 - Invalid API key
-  ForbiddenError,               // 403 - Access denied
-  InsufficientCreditsError,     // 403 - Not enough credits
-  TooManyJobsError,             // 403 - Job limit reached
-  NotFoundError,                // 404 - Resource not found
-  EmailJobNotFoundError,        // 404 - Job not found
-  MaillistNotFoundError,        // 404 - Bulk list not found
-  BadRequestError,              // 400 - Bad request
-  InvalidFileError,             // 400 - Invalid file format
-  MaillistNotFinishedError,     // 400 - Bulk list still processing
-  RateLimitError,               // 429 - Rate limit exceeded
-  NetworkError,                 // Network/connection error
-  TimeoutError,                 // Request timeout
-  ValidationError,              // Client-side validation error
-  ParseError,                   // JSON parse error
+  EmailListVerifyError, // Base error class
+  AuthenticationError, // 401 - Invalid API key
+  ForbiddenError, // 403 - Access denied
+  InsufficientCreditsError, // 403 - Not enough credits
+  TooManyJobsError, // 403 - Job limit reached
+  NotFoundError, // 404 - Resource not found
+  EmailJobNotFoundError, // 404 - Job not found
+  MaillistNotFoundError, // 404 - Bulk list not found
+  BadRequestError, // 400 - Bad request
+  InvalidFileError, // 400 - Invalid file format
+  MaillistNotFinishedError, // 400 - Bulk list still processing
+  RateLimitError, // 429 - Rate limit exceeded
+  NetworkError, // Network/connection error
+  TimeoutError, // Request timeout
+  ValidationError, // Client-side validation error
+  ParseError, // JSON parse error
 } from 'emaillistverify-sdk-js';
 ```
 
@@ -412,8 +414,12 @@ const client = new EmailListVerifyClient('api-key');
 
 // Type-safe API calls
 const result: EmailVerificationResult = await client.verifyEmail('test@example.com');
-const detailed: DetailedEmailVerificationResult = await client.verifyEmailDetailed('test@example.com');
-const job: EmailJob = await client.createEmailJob({ email: 'test@example.com', quality: 'standard' });
+const detailed: DetailedEmailVerificationResult =
+  await client.verifyEmailDetailed('test@example.com');
+const job: EmailJob = await client.createEmailJob({
+  email: 'test@example.com',
+  quality: 'standard',
+});
 const credits: CreditsResponse = await client.getCredits();
 ```
 
@@ -444,6 +450,7 @@ The SDK includes 5 comprehensive usage examples:
 5. **[error-handling.js](./examples/error-handling.js)** - Comprehensive error management
 
 **Run examples:**
+
 ```bash
 export EMAILLISTVERIFY_API_KEY="your-api-key"
 node examples/basic-usage.js
@@ -459,9 +466,10 @@ See [examples/README.md](./examples/README.md) for detailed usage examples and u
 
 ```javascript
 const client = new EmailListVerifyClient(apiKey, {
-  baseUrl: 'https://api.emaillistverify.com',  // API endpoint
-  timeout: 30000,                               // Request timeout (ms)
-  headers: {                                    // Custom headers
+  baseUrl: 'https://api.emaillistverify.com', // API endpoint
+  timeout: 30000, // Request timeout (ms)
+  headers: {
+    // Custom headers
     'X-Custom-Header': 'value',
   },
 });
@@ -517,19 +525,19 @@ See [test-scripts/README.md](./test-scripts/README.md) for detailed testing docu
 
 ### All Methods
 
-| Method | Description | Docs |
-|--------|-------------|------|
-| `verifyEmail()` | Simple email verification | [📖](#single-email-verification) |
-| `verifyEmailDetailed()` | Detailed verification with SMTP | [📖](#single-email-verification) |
-| `createEmailJob()` | Create async verification job | [📖](#async-email-jobs) |
-| `getEmailJob()` | Check async job status | [📖](#async-email-jobs) |
-| `findContact()` | Find contact by name/domain | [📖](#contact-finder) |
-| `checkDisposable()` | Check if domain is disposable | [📖](#disposable-domain-check) |
-| `uploadBulkFile()` | Upload CSV for bulk verification | [📖](#bulk-verification) |
-| `getBulkProgress()` | Check bulk processing progress | [📖](#bulk-verification) |
-| `downloadBulkResults()` | Download verification results | [📖](#bulk-verification) |
-| `deleteBulkList()` | Delete bulk list | [📖](#bulk-verification) |
-| `getCredits()` | Get account credit balance | [📖](#credits-management) |
+| Method                  | Description                      | Docs                             |
+| ----------------------- | -------------------------------- | -------------------------------- |
+| `verifyEmail()`         | Simple email verification        | [📖](#single-email-verification) |
+| `verifyEmailDetailed()` | Detailed verification with SMTP  | [📖](#single-email-verification) |
+| `createEmailJob()`      | Create async verification job    | [📖](#async-email-jobs)          |
+| `getEmailJob()`         | Check async job status           | [📖](#async-email-jobs)          |
+| `findContact()`         | Find contact by name/domain      | [📖](#contact-finder)            |
+| `checkDisposable()`     | Check if domain is disposable    | [📖](#disposable-domain-check)   |
+| `uploadBulkFile()`      | Upload CSV for bulk verification | [📖](#bulk-verification)         |
+| `getBulkProgress()`     | Check bulk processing progress   | [📖](#bulk-verification)         |
+| `downloadBulkResults()` | Download verification results    | [📖](#bulk-verification)         |
+| `deleteBulkList()`      | Delete bulk list                 | [📖](#bulk-verification)         |
+| `getCredits()`          | Get account credit balance       | [📖](#credits-management)        |
 
 **💳 Credit Costs:** See [pricing documentation](https://emaillistverify.com/pricing) for current credit costs per operation.
 
@@ -552,6 +560,7 @@ The `result` field can be:
 ## Best Practices
 
 ### 1. Always Handle Errors
+
 ```javascript
 try {
   const result = await client.verifyEmail(email);
@@ -565,6 +574,7 @@ try {
 ```
 
 ### 2. Check Credits Before Bulk Operations
+
 ```javascript
 const credits = await client.getCredits();
 const available = credits.onDemand.available + (credits.subscription?.available || 0);
@@ -575,11 +585,13 @@ if (available < emailCount) {
 ```
 
 ### 3. Use Appropriate Method
+
 - **Single emails** → `verifyEmail()` or `verifyEmailDetailed()`
 - **Background tasks** → `createEmailJob()` + `getEmailJob()`
 - **Large lists (100+)** → `uploadBulkFile()` + polling
 
 ### 4. Clean Up Bulk Lists
+
 ```javascript
 try {
   const results = await client.downloadBulkResults(fileId);
@@ -590,6 +602,7 @@ try {
 ```
 
 ### 5. Implement Retry Logic
+
 ```javascript
 async function verifyWithRetry(email, maxRetries = 3) {
   for (let i = 0; i < maxRetries; i++) {
@@ -611,31 +624,33 @@ async function verifyWithRetry(email, maxRetries = 3) {
 ## FAQ
 
 ### What Node.js version is required?
+
 **Node.js 20+** is required because the SDK uses the native `fetch` API.
 
 ### Does it work in browsers?
+
 **No.** The API doesn't support CORS, so it's server-side only (Node.js).
 
 ### What's the difference between `verifyEmail()` and `verifyEmailDetailed()`?
+
 - `verifyEmail()` - Basic verification
 - `verifyEmailDetailed()` - Includes SMTP check + metadata like name, gender, country
 
 See [pricing documentation](https://emaillistverify.com/pricing) for credit costs.
 
 ### How do I handle bulk verification for large files?
+
 Upload with `uploadBulkFile()`, then implement polling with `getBulkProgress()`. See [examples/bulk-verification.js](./examples/bulk-verification.js).
 
 ### Does polling cost extra credits?
+
 **No.** Checking progress with `getBulkProgress()` is free. Credits are only consumed on upload.
 
 ### What happens if my bulk file is still processing?
+
 You'll get a `MaillistNotFinishedError` if you try to download results before processing completes.
 
 ---
-
-## Known API Issues
-
-The SDK works around 6 documented API specification issues. See [API_SPEC_ISSUES.md](./API_SPEC_ISSUES.md) for details.
 
 ---
 
@@ -696,6 +711,7 @@ MIT License - see [LICENSE](./LICENSE) for details.
 ## Acknowledgments
 
 Built with:
+
 - [TypeScript](https://www.typescriptlang.org/) - Type-safe JavaScript
 - [tsup](https://tsup.egoist.dev/) - Zero-config bundler
 - [Vitest](https://vitest.dev/) - Fast unit testing
