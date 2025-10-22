@@ -37,7 +37,7 @@ console.log(result);
 const bulkResult = await client.verifyBulk([
   'valid@gmail.com',
   'invalid@fake.com',
-  'info@example.com'
+  'info@example.com',
 ]);
 console.log(bulkResult);
 // {
@@ -57,18 +57,18 @@ import EmailListVerify, {
   EmailVerificationResult,
   EmailVerificationResponse,
   BulkVerificationResponse,
-  EmailListVerifyError
+  EmailListVerifyError,
 } from '@emaillistverify/sdk';
 
 const client = new EmailListVerify('YOUR_API_KEY');
 
 try {
   const result: EmailVerificationResponse = await client.verifyEmail('test@example.com');
-  
+
   if (result.isValid) {
     console.log('Email is valid!');
   }
-  
+
   if (result.isDisposable) {
     console.log('Email is disposable');
   }
@@ -97,6 +97,7 @@ new EmailListVerify(apiKey: string, options?: { baseUrl?: string })
 Verifies a single email address.
 
 **Returns:**
+
 ```typescript
 {
   email: string;
@@ -113,6 +114,7 @@ Verifies a single email address.
 Verifies multiple email addresses in bulk.
 
 **Returns:**
+
 ```typescript
 {
   results: EmailVerificationResponse[];
@@ -129,6 +131,7 @@ Gets remaining API credits.
 ### Result Types
 
 The `result` field can be one of:
+
 - `ok` - Email is valid
 - `invalid` - Email format is invalid
 - `invalid_mx` - Domain has invalid MX records
@@ -182,17 +185,13 @@ if (result.isValid && !result.isDisposable && !result.isRole) {
 ### Bulk verification with filtering
 
 ```javascript
-const emails = [
-  'user1@gmail.com',
-  'user2@tempmail.com',
-  'admin@company.com'
-];
+const emails = ['user1@gmail.com', 'user2@tempmail.com', 'admin@company.com'];
 
 const bulkResult = await client.verifyBulk(emails);
 
 const validEmails = bulkResult.results
-  .filter(r => r.isValid && !r.isDisposable)
-  .map(r => r.email);
+  .filter((r) => r.isValid && !r.isDisposable)
+  .map((r) => r.email);
 
 console.log('Valid emails:', validEmails);
 ```
