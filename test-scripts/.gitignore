@@ -1,0 +1,10 @@
+# Environment variables (contains API key)
+.env
+
+# Test results
+results/
+
+# Downloaded files
+*.csv
+*.xlsx
+!test-data/*.csv

@@ -103,7 +103,7 @@ export interface VerifyEmailDetailedResponse {
   /** Deliverability status */
   result: VerificationResult;
   /** Internal status of processing */
-  internalResult: string;
+  internalResult: string | null;
   /** MX server for the email domain */
   mxServer: string | null;
   /** IP address of MX server */

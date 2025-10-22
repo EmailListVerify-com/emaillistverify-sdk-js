@@ -33,6 +33,7 @@
     "format:check": "prettier --check \"src/**/*.ts\"",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:integration": "node test-scripts/node-integration.mjs",
     "prepublishOnly": "npm run type-check && npm run lint && npm run build"
   },
   "repository": {
