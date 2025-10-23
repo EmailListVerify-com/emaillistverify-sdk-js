@@ -7,7 +7,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-Nothing yet - see [v1.0.0](#100---2025-10-23) for latest release.
+Nothing yet - see [v1.0.1](#101---2025-01-23) for latest release.
+
+## [1.0.1] - 2025-01-23
+
+### Fixed
+
+**Documentation:**
+- Fixed incorrect type names in README method signatures (8 fixes):
+  - `DetailedEmailVerificationResult` → `VerifyEmailDetailedResponse`
+  - `EmailJob` → `CreateEmailJobResponse`
+  - `EmailJobStatus` → `EmailJobResponse`
+  - `FindContactResult` → `FindContactResponse`
+  - `DisposableDomainResult` → `CheckDisposableResponse`
+  - `BulkUploadResult` → `string`
+  - `BulkProgress` → `MaillistProgressResponse`
+  - `Blob` → `string | Buffer`
+- Fixed incorrect examples showing non-existent fields (5 fixes):
+  - `verifyEmail()` - corrected to show it returns string, not object
+  - `findContact()` - fixed to show correct `ContactEmailResult` structure
+  - `checkDisposable()` - corrected field names (`result` instead of `disposable`)
+  - `uploadBulkFile()` - fixed to show it returns file ID string
+  - `downloadBulkResults()` - corrected return type handling
+- Updated support URLs:
+  - API Documentation: `https://api.emaillistverify.com/api-doc`
+  - Sign Up: `https://app.emaillistverify.com/signup`
+  - Support email: `contact@emaillistverify.com`
+- Updated package name references from `emaillistverify-sdk-js` to `@emaillistverify/sdk`
+- Updated GitHub repository URLs from placeholder to `EmailListVerify-com`
+- Fixed Features list formatting for npm (added blank lines between items)
+- Updated TypeScript examples to use actual exported type names
+
+**Note:** This is a documentation-only release. No code changes.
 
 ## [1.0.0] - 2025-10-23
 
