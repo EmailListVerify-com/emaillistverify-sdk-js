@@ -1,0 +1,6 @@
+Email,First Name,Last Name,Company
+test1@gmail.com,John,Doe,Acme Corp
+test2@yahoo.com,Jane,Smith,Test Inc
+test3@outlook.com,Bob,Johnson,Example LLC
+invalid-email@nonexistentdomain12345.com,Invalid,User,Fake Company
+disposable@tempmail.com,Temp,User,Disposable Inc
