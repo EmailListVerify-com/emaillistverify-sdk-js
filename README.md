@@ -3,7 +3,7 @@
 Official JavaScript/TypeScript SDK for the [EmailListVerify API](https://www.emaillistverify.com/) - Professional email validation and verification service.
 
 [![CI](https://github.com/EmailListVerify-com/emaillistverify-sdk-js/actions/workflows/ci.yml/badge.svg)](https://github.com/EmailListVerify-com/emaillistverify-sdk-js/actions/workflows/ci.yml)
-[![npm version](https://img.shields.io/npm/v/emaillistverify-sdk-js.svg)](https://www.npmjs.com/package/emaillistverify-sdk-js)
+[![npm version](https://img.shields.io/npm/v/@emaillistverify/sdk.svg)](https://www.npmjs.com/package/@emaillistverify/sdk)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue.svg)](https://www.typescriptlang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen.svg)](https://nodejs.org/)
@@ -43,7 +43,7 @@ Official JavaScript/TypeScript SDK for the [EmailListVerify API](https://www.ema
 ## Installation
 
 ```bash
-npm install emaillistverify-sdk-js
+npm install @emaillistverify/sdk
 ```
 
 **Requirements:**
@@ -56,7 +56,7 @@ npm install emaillistverify-sdk-js
 ## Quick Start
 
 ```javascript
-import { EmailListVerifyClient } from 'emaillistverify-sdk-js';
+import { EmailListVerifyClient } from '@emaillistverify/sdk';
 
 // Initialize with your API key
 const client = new EmailListVerifyClient('your-api-key-here');
@@ -333,7 +333,7 @@ import {
   TimeoutError, // Request timeout
   ValidationError, // Client-side validation error
   ParseError, // JSON parse error
-} from 'emaillistverify-sdk-js';
+} from '@emaillistverify/sdk';
 ```
 
 ### Type Guards
@@ -348,7 +348,7 @@ import {
   isNotFoundError,
   isNetworkError,
   isValidationError,
-} from 'emaillistverify-sdk-js';
+} from '@emaillistverify/sdk';
 
 try {
   const result = await client.verifyEmail('test@example.com');
@@ -410,7 +410,7 @@ import {
   BulkProgress,
   CreditsResponse,
   ClientConfig,
-} from 'emaillistverify-sdk-js';
+} from '@emaillistverify/sdk';
 
 const client = new EmailListVerifyClient('api-key');
 
@@ -661,7 +661,7 @@ You'll get a `MaillistNotFinishedError` if you try to download results before pr
 - **Documentation:** https://www.emaillistverify.com/docs
 - **Get API Key:** https://apps.emaillistverify.com/api
 - **Purchase Credits:** https://apps.emaillistverify.com
-- **Report Issues:** [GitHub Issues](https://github.com/yourusername/emaillistverify-sdk-js/issues)
+- **Report Issues:** [GitHub Issues](https://github.com/EmailListVerify-com/emaillistverify-sdk-js/issues)
 - **Email Support:** support@emaillistverify.com
 
 ---
@@ -680,7 +680,7 @@ Contributions are welcome! Please:
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/emaillistverify-sdk-js.git
+git clone https://github.com/EmailListVerify-com/emaillistverify-sdk-js.git
 cd emaillistverify-sdk-js
 
 # Install dependencies

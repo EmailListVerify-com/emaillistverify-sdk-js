@@ -93,7 +93,7 @@ jobs:
 
             ### Installation
             ```bash
-            npm install emaillistverify-sdk-js@${{ needs.version-check.outputs.version }}
+            npm install @emaillistverify/sdk@${{ needs.version-check.outputs.version }}
             ```
 
             See [CHANGELOG.md](./CHANGELOG.md) for detailed release notes.
