@@ -1,6 +1,6 @@
 {
   "name": "@emaillistverify/sdk",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Official TypeScript SDK for the EmailListVerify API - Complete email validation and verification service.",
   "type": "module",
   "main": "./dist/index.cjs",

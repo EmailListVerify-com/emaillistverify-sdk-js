@@ -11,10 +11,15 @@ Official JavaScript/TypeScript SDK for the [EmailListVerify API](https://www.ema
 ## Features
 
 ✅ **Zero dependencies** - Uses Node.js 20+ native `fetch` API
+
 ✅ **Full TypeScript support** - Strict type safety with complete type definitions
+
 ✅ **ESM & CommonJS** - Dual module format for maximum compatibility
+
 ✅ **All 11 API endpoints** - Complete API coverage
+
 ✅ **13 error classes** - Comprehensive error handling with type guards
+
 ✅ **Production ready** - Thoroughly tested with 161 tests (85 unit + 76 integration)
 
 ---
@@ -61,20 +66,24 @@ import { EmailListVerifyClient } from '@emaillistverify/sdk';
 // Initialize with your API key
 const client = new EmailListVerifyClient('your-api-key-here');
 
-// Verify a single email
+// Simple verification - returns just the status
 const result = await client.verifyEmail('test@example.com');
-console.log(result);
+console.log(result); // 'ok'
+
+// For detailed info, use verifyEmailDetailed
+const detailed = await client.verifyEmailDetailed('test@example.com');
+console.log(detailed);
 // {
 //   email: 'test@example.com',
 //   result: 'ok',
-//   role: false,
-//   disposable: false,
-//   free: true,
-//   didYouMean: null
+//   isRole: false,
+//   isFree: true,
+//   firstName: 'Test',
+//   ...
 // }
 ```
 
-**Get your API key:** https://apps.emaillistverify.com/api
+**Get your API key:** https://app.emaillistverify.com/signup
 
 ---
 
@@ -82,40 +91,49 @@ console.log(result);
 
 ### Single Email Verification
 
-#### `verifyEmail(email: string): Promise<EmailVerificationResult>`
+#### `verifyEmail(email: string): Promise<string>`
 
-Simple email verification - checks email validity, disposable status, and more.
+Simple email verification - returns just the deliverability status as a string.
 
 ```javascript
 const result = await client.verifyEmail('john.doe@example.com');
+console.log(result); // 'ok' | 'invalid' | 'unknown' | 'disposable' | etc.
 
-console.log(result.result); // 'ok' | 'invalid' | 'unknown' | etc.
-console.log(result.disposable); // true/false - is disposable email?
-console.log(result.free); // true/false - free email provider?
-console.log(result.role); // true/false - role-based email?
-console.log(result.didYouMean); // Suggested correction or null
+// Possible values:
+// 'ok' - Email is valid and deliverable
+// 'invalid_syntax' - Invalid email format
+// 'disposable' - Temporary/disposable email
+// 'dead_server' - Domain doesn't exist
+// 'email_disabled' - Email disabled
+// 'unknown' - Unable to verify
+// ... and more (see VerificationResult type)
 ```
 
 **💳 Credits:** See [pricing documentation](https://emaillistverify.com/pricing)
 
+**Note:** For detailed information (role, free provider, name detection), use `verifyEmailDetailed()` instead.
+
 ---
 
-#### `verifyEmailDetailed(email: string): Promise<DetailedEmailVerificationResult>`
+#### `verifyEmailDetailed(email: string): Promise<VerifyEmailDetailedResponse>`
 
-Detailed verification with SMTP check and additional metadata.
+Detailed verification with additional metadata including name detection and email classification.
 
 ```javascript
 const result = await client.verifyEmailDetailed('ceo@company.com');
 
-console.log(result.result); // Verification result
-console.log(result.smtp_check); // SMTP server response
-console.log(result.mx_found); // MX records found?
-console.log(result.accept_all); // Server accepts all emails?
-console.log(result.catch_all); // Catch-all domain?
-console.log(result.firstName); // First name (if detected)
-console.log(result.lastName); // Last name (if detected)
-console.log(result.gender); // Gender (if detected)
-console.log(result.country); // Country (if detected)
+console.log(result.email); // 'ceo@company.com'
+console.log(result.result); // 'ok' | 'invalid' | etc.
+console.log(result.mxServer); // MX server hostname
+console.log(result.esp); // Email Service Provider (e.g., 'Google', 'Microsoft 365')
+console.log(result.isRole); // true/false - role-based email (info@, ceo@)
+console.log(result.isFree); // true/false - free email provider
+console.log(result.isNoReply); // true/false - no-reply email
+console.log(result.firstName); // 'John' (if detected)
+console.log(result.lastName); // 'Doe' (if detected)
+console.log(result.gender); // 'male' | 'female' | null
+console.log(result.account); // Local part of email (before @)
+console.log(result.tag); // Email tag (after +)
 ```
 
 **💳 Credits:** See [pricing documentation](https://emaillistverify.com/pricing)
@@ -126,7 +144,7 @@ console.log(result.country); // Country (if detected)
 
 Use async jobs when you don't need immediate results.
 
-#### `createEmailJob(params: CreateEmailJobRequest): Promise<EmailJob>`
+#### `createEmailJob(params: CreateEmailJobRequest): Promise<CreateEmailJobResponse>`
 
 Create an async email verification job.
 
@@ -143,7 +161,7 @@ console.log(job.createdAt); // ISO timestamp
 
 ---
 
-#### `getEmailJob(jobId: string): Promise<EmailJobStatus>`
+#### `getEmailJob(jobId: string): Promise<EmailJobResponse>`
 
 Check the status of an async job.
 
@@ -166,22 +184,20 @@ if (status.status === 'finished') {
 
 Find contact email addresses by name and domain.
 
-#### `findContact(params: FindContactRequest): Promise<FindContactResult>`
+#### `findContact(params: FindContactRequest): Promise<FindContactResponse>`
 
 ```javascript
-const result = await client.findContact({
+const contacts = await client.findContact({
   firstName: 'John',
   lastName: 'Doe', // optional
   domain: 'example.com',
 });
 
-console.log(result.emails.length); // Number of contacts found
+console.log(contacts.length); // Number of contacts found
 
-result.emails.forEach((contact) => {
+contacts.forEach((contact) => {
   console.log(contact.email); // Email address
-  console.log(contact.firstName); // First name
-  console.log(contact.lastName); // Last name
-  console.log(contact.position); // Job title/position
+  console.log(contact.confidence); // 'low' | 'medium' | 'high' | 'unknown'
 });
 ```
 
@@ -195,14 +211,14 @@ result.emails.forEach((contact) => {
 
 Check if a domain is a disposable/temporary email provider.
 
-#### `checkDisposable(domain: string): Promise<DisposableDomainResult>`
+#### `checkDisposable(domain: string): Promise<CheckDisposableResponse>`
 
 ```javascript
 const result = await client.checkDisposable('tempmail.com');
 
 console.log(result.domain); // 'tempmail.com'
-console.log(result.disposable); // true
-console.log(result.reason); // 'Known disposable email provider'
+console.log(result.result); // 'disposable' | 'ok' | 'dead_server' | 'invalid_mx' | 'unknown'
+console.log(result.mxServer); // MX server hostname
 ```
 
 **💳 Credits:** See [pricing documentation](https://emaillistverify.com/pricing)
@@ -213,17 +229,16 @@ console.log(result.reason); // 'Known disposable email provider'
 
 Upload CSV files for batch email verification.
 
-#### `uploadBulkFile(file: Buffer | Blob, filename: string): Promise<BulkUploadResult>`
+#### `uploadBulkFile(file: Buffer | Blob, filename: string): Promise<string>`
 
 ```javascript
 import { readFileSync } from 'fs';
 
 const fileBuffer = readFileSync('./emails.csv');
-const upload = await client.uploadBulkFile(fileBuffer, 'emails.csv');
+const fileId = await client.uploadBulkFile(fileBuffer, 'emails.csv');
 
-console.log(upload.fileId); // File ID for tracking
-console.log(upload.status); // 'processing'
-console.log(upload.fileName); // Original filename
+console.log(fileId); // Returns file ID as string (e.g., "12345")
+// Use this ID to check progress with getBulkProgress()
 ```
 
 **CSV Format:**
@@ -237,7 +252,7 @@ test@tempmail.com
 
 ---
 
-#### `getBulkProgress(fileId: string): Promise<BulkProgress>`
+#### `getBulkProgress(fileId: string): Promise<MaillistProgressResponse>`
 
 Check bulk processing progress.
 
@@ -253,21 +268,27 @@ console.log(progress.unique); // Unique emails found
 
 ---
 
-#### `downloadBulkResults(fileId: string, options?: DownloadMaillistOptions): Promise<Blob>`
+#### `downloadBulkResults(fileId: string, options?: DownloadMaillistOptions): Promise<string | Buffer>`
 
 Download processed results as CSV.
 
 ```javascript
-const resultsBlob = await client.downloadBulkResults('file-12345');
+const results = await client.downloadBulkResults('file-12345');
 
 // Save to file (Node.js)
 import { writeFileSync } from 'fs';
-const buffer = Buffer.from(await resultsBlob.arrayBuffer());
-writeFileSync('./results.csv', buffer);
+if (typeof results === 'string') {
+  writeFileSync('./results.csv', results);
+} else {
+  writeFileSync('./results.csv', results);
+}
 
-// Download with duplicates included
-const withDuplicates = await client.downloadBulkResults('file-12345', {
+// Download with additional columns and duplicates
+const detailedResults = await client.downloadBulkResults('file-12345', {
+  addFirstName: true,
+  addLastName: true,
   addDuplicates: true,
+  format: 'csv',
 });
 ```
 
@@ -399,29 +420,35 @@ The SDK is written in TypeScript with full type safety.
 ```typescript
 import {
   EmailListVerifyClient,
-  EmailVerificationResult,
-  DetailedEmailVerificationResult,
-  EmailJob,
-  EmailJobStatus,
+  VerifyEmailResponse,
+  VerifyEmailDetailedResponse,
+  CreateEmailJobResponse,
+  EmailJobResponse,
   FindContactRequest,
-  FindContactResult,
-  DisposableDomainResult,
-  BulkUploadResult,
-  BulkProgress,
+  FindContactResponse,
+  CheckDisposableResponse,
+  BulkUploadResponse,
+  MaillistProgressResponse,
   CreditsResponse,
   ClientConfig,
+  VerificationResult,
 } from '@emaillistverify/sdk';
 
 const client = new EmailListVerifyClient('api-key');
 
 // Type-safe API calls
-const result: EmailVerificationResult = await client.verifyEmail('test@example.com');
-const detailed: DetailedEmailVerificationResult =
+const result: VerifyEmailResponse = await client.verifyEmail('test@example.com');
+// result is a string: 'ok' | 'invalid' | 'disposable' | etc.
+
+const detailed: VerifyEmailDetailedResponse =
   await client.verifyEmailDetailed('test@example.com');
-const job: EmailJob = await client.createEmailJob({
+// detailed is an object with email, result, isRole, isFree, firstName, etc.
+
+const job: CreateEmailJobResponse = await client.createEmailJob({
   email: 'test@example.com',
   quality: 'standard',
 });
+
 const credits: CreditsResponse = await client.getCredits();
 ```
 
@@ -530,7 +557,7 @@ See [test-scripts/README.md](./test-scripts/README.md) for detailed testing docu
 | Method                  | Description                      | Docs                             |
 | ----------------------- | -------------------------------- | -------------------------------- |
 | `verifyEmail()`         | Simple email verification        | [📖](#single-email-verification) |
-| `verifyEmailDetailed()` | Detailed verification with SMTP  | [📖](#single-email-verification) |
+| `verifyEmailDetailed()` | Detailed verification with metadata | [📖](#single-email-verification) |
 | `createEmailJob()`      | Create async verification job    | [📖](#async-email-jobs)          |
 | `getEmailJob()`         | Check async job status           | [📖](#async-email-jobs)          |
 | `findContact()`         | Find contact by name/domain      | [📖](#contact-finder)            |
@@ -658,11 +685,11 @@ You'll get a `MaillistNotFinishedError` if you try to download results before pr
 
 ## Support
 
-- **Documentation:** https://www.emaillistverify.com/docs
-- **Get API Key:** https://apps.emaillistverify.com/api
-- **Purchase Credits:** https://apps.emaillistverify.com
+- **API Documentation:** https://api.emaillistverify.com/api-doc
+- **Sign Up / Get API Key:** https://app.emaillistverify.com/signup
+- **Pricing:** https://emaillistverify.com/pricing
 - **Report Issues:** [GitHub Issues](https://github.com/EmailListVerify-com/emaillistverify-sdk-js/issues)
-- **Email Support:** support@emaillistverify.com
+- **Email Support:** contact@emaillistverify.com
 
 ---
 
