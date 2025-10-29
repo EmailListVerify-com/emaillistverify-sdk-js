@@ -16,9 +16,9 @@ Official JavaScript/TypeScript SDK for the [EmailListVerify API](https://www.ema
 
 ✅ **ESM & CommonJS** - Dual module format for maximum compatibility
 
-✅ **All 11 API endpoints** - Complete API coverage
+✅ **All 13 API endpoints** - Complete API coverage
 
-✅ **13 error classes** - Comprehensive error handling with type guards
+✅ **14 error classes** - Comprehensive error handling with type guards
 
 ✅ **Production ready** - Thoroughly tested with 161 tests (85 unit + 76 integration)
 
@@ -34,6 +34,7 @@ Official JavaScript/TypeScript SDK for the [EmailListVerify API](https://www.ema
   - [Contact Finder](#contact-finder)
   - [Disposable Domain Check](#disposable-domain-check)
   - [Bulk Verification](#bulk-verification)
+  - [Inbox Placement Test](#inbox-placement-test)
   - [Credits Management](#credits-management)
 - [Error Handling](#error-handling)
 - [TypeScript](#typescript)
@@ -309,6 +310,88 @@ console.log('Bulk list deleted');
 
 ---
 
+### Inbox Placement Test
+
+Test where your emails land across different email service providers (Gmail, Yahoo, Outlook, etc.).
+
+#### `createPlacementTest(request?: CreatePlacementTestRequest): Promise<CreatePlacementTestResponse>`
+
+Create a new inbox placement test.
+
+```javascript
+const test = await client.createPlacementTest({
+  name: 'Q1 2025 Campaign Test',
+  webhookUrl: 'https://yourapp.com/webhooks/placement-test', // optional
+});
+
+console.log(test.code); // "ELV-A1B2C3D4E5" - Include this in your email
+console.log(test.emails); // Array of seed emails to send to
+console.log(test.status); // 'running'
+
+// Send your test email from YOUR production system to all seed emails
+// Make sure to include the tracking code in the subject or body
+```
+
+**💳 Credits:** 100 per test
+
+**How it works:**
+
+1. Create a test and receive a tracking code
+2. Get a list of seed email addresses
+3. Send your test email to all seed addresses from your production email system
+4. Include the tracking code in your email subject or body
+5. Poll for results or receive webhook notification
+
+**Refund policy:** If no emails are detected (all missing/waiting), 100 credits are refunded automatically.
+
+---
+
+#### `getPlacementTest(code: string): Promise<PlacementTestResponse>`
+
+Get placement test results and status.
+
+```javascript
+const results = await client.getPlacementTest('ELV-A1B2C3D4E5');
+
+console.log(results.status); // 'running' | 'complete'
+console.log(results.sender); // Auto-detected sender email
+console.log(results.summary.inbox); // Percentage that landed in inbox
+console.log(results.summary.spam); // Percentage that landed in spam
+console.log(results.summary.promotions); // Percentage in promotions/social tab
+
+// Detailed breakdown by recipient
+results.recipients.forEach((recipient) => {
+  console.log(`${recipient.email} (${recipient.esp}): ${recipient.placement}`);
+  // Example: test@gmail.com (google): inbox
+});
+
+// Poll every 30-60 seconds while status is 'running'
+while (results.status === 'running') {
+  await new Promise((resolve) => setTimeout(resolve, 60000)); // Wait 60 seconds
+  results = await client.getPlacementTest(code);
+}
+
+console.log('Test complete!');
+```
+
+**💳 Credits:** Free - does not consume credits
+
+**Response includes:**
+
+- **Status**: `running` or `complete`
+- **Summary**: Percentages for inbox, spam, promotions, waiting, missing
+- **Recipients**: Detailed placement for each seed email
+  - `inbox` - Primary inbox
+  - `category` - Promotions/social/updates folder
+  - `spam` - Spam folder
+  - `waiting` - Not yet detected
+  - `missing` - Not found (bounced/blocked)
+- **Sender**: Auto-detected sender email address
+
+**Typical completion time:** 5-10 minutes after sending emails
+
+---
+
 ### Credits Management
 
 #### `getCredits(): Promise<CreditsResponse>`
@@ -332,7 +415,7 @@ if (credits.subscription) {
 
 ## Error Handling
 
-The SDK provides 13 specialized error classes for comprehensive error handling.
+The SDK provides 14 specialized error classes for comprehensive error handling.
 
 ### Error Types
 
@@ -346,6 +429,7 @@ import {
   NotFoundError, // 404 - Resource not found
   EmailJobNotFoundError, // 404 - Job not found
   MaillistNotFoundError, // 404 - Bulk list not found
+  PlacementTestNotFoundError, // 404 - Placement test not found
   BadRequestError, // 400 - Bad request
   InvalidFileError, // 400 - Invalid file format
   MaillistNotFinishedError, // 400 - Bulk list still processing
@@ -566,6 +650,8 @@ See [test-scripts/README.md](./test-scripts/README.md) for detailed testing docu
 | `getBulkProgress()`     | Check bulk processing progress   | [📖](#bulk-verification)         |
 | `downloadBulkResults()` | Download verification results    | [📖](#bulk-verification)         |
 | `deleteBulkList()`      | Delete bulk list                 | [📖](#bulk-verification)         |
+| `createPlacementTest()` | Create inbox placement test      | [📖](#inbox-placement-test)      |
+| `getPlacementTest()`    | Get placement test results       | [📖](#inbox-placement-test)      |
 | `getCredits()`          | Get account credit balance       | [📖](#credits-management)        |
 
 **💳 Credit Costs:** See [pricing documentation](https://emaillistverify.com/pricing) for current credit costs per operation.

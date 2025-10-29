@@ -46,6 +46,16 @@ export type {
   CreditsResponse,
   OnDemandCredits,
   SubscriptionCredits,
+  // Placement test
+  PlacementTestStatus,
+  PlacementLocation,
+  PlacementTestESP,
+  PlacementTestAccountType,
+  CreatePlacementTestRequest,
+  CreatePlacementTestResponse,
+  PlacementTestRecipient,
+  PlacementTestSummary,
+  PlacementTestResponse,
   // Error types
   ApiErrorResponse,
 } from './types';
@@ -60,6 +70,7 @@ export {
   NotFoundError,
   EmailJobNotFoundError,
   MaillistNotFoundError,
+  PlacementTestNotFoundError,
   BadRequestError,
   InvalidFileError,
   MaillistNotFinishedError,
@@ -76,4 +87,5 @@ export {
   isNotFoundError,
   isNetworkError,
   isValidationError,
+  isPlacementTestNotFoundError,
 } from './utils/errors';

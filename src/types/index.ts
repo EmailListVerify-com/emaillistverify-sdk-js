@@ -385,6 +385,114 @@ export interface ClientConfig {
 }
 
 // ============================================================================
+// Inbox Placement Test
+// ============================================================================
+
+/**
+ * Placement test status
+ */
+export type PlacementTestStatus = 'running' | 'complete';
+
+/**
+ * Email placement location
+ */
+export type PlacementLocation = 'inbox' | 'category' | 'spam' | 'waiting' | 'missing';
+
+/**
+ * Email Service Provider for placement tests
+ */
+export type PlacementTestESP = 'google' | 'yahoo' | 'outlook' | 'zoho' | 'other';
+
+/**
+ * Email account type
+ */
+export type PlacementTestAccountType = 'personal' | 'professional';
+
+/**
+ * Request body for /api/inboxPlacementTests (POST)
+ */
+export interface CreatePlacementTestRequest {
+  /** Optional name for the placement test */
+  name?: string;
+  /** Optional webhook URL to receive results when test completes */
+  webhookUrl?: string;
+}
+
+/**
+ * Response from /api/inboxPlacementTests (POST)
+ */
+export interface CreatePlacementTestResponse {
+  /** Unique identifier for the placement test (MongoDB ObjectId) */
+  id: string;
+  /** Tracking code to include in test emails (e.g., "ELV-A1B2C3D4E5") */
+  code: string;
+  /** Name of the placement test */
+  name: string;
+  /** List of seed email addresses to send test emails to */
+  emails: string[];
+  /** Current status of the placement test */
+  status: PlacementTestStatus;
+  /** Timestamp when the test was created (ISO 8601) */
+  createdAt: string;
+}
+
+/**
+ * Placement test recipient result
+ */
+export interface PlacementTestRecipient {
+  /** Seed email address */
+  email: string;
+  /** Email service provider */
+  esp: PlacementTestESP;
+  /** Type of email account */
+  type: PlacementTestAccountType;
+  /** Where the email landed */
+  placement: PlacementLocation;
+  /** When the email was detected (ISO 8601), null if waiting/missing */
+  foundAt: string | null;
+}
+
+/**
+ * Summary of placement results
+ */
+export interface PlacementTestSummary {
+  /** Percentage of emails that landed in primary inbox */
+  inbox: number;
+  /** Percentage of emails that landed in promotions/social/updates folder */
+  promotions: number;
+  /** Percentage of emails that landed in spam folder */
+  spam: number;
+  /** Percentage of emails not yet detected (test still running) */
+  waiting: number;
+  /** Percentage of emails not found (may have bounced or been blocked) */
+  missing: number;
+}
+
+/**
+ * Response from /api/inboxPlacementTests/{code} (GET)
+ */
+export interface PlacementTestResponse {
+  /** ID of the user who created the test */
+  userId: number | null;
+  /** Name of the placement test */
+  name: string;
+  /** Tracking code for the test */
+  code: string;
+  /** Current status of the test */
+  status: PlacementTestStatus;
+  /** Email address that sent the test (auto-detected) */
+  sender: string | null;
+  /** List of seed emails with placement results */
+  recipients: PlacementTestRecipient[];
+  /** Summary of placement results as percentages */
+  summary: PlacementTestSummary;
+  /** When the test was created (ISO 8601) */
+  createdAt: string;
+  /** When the test was last updated (ISO 8601) */
+  updatedAt: string | null;
+}
+
+// ============================================================================
 // Type Exports
 // ============================================================================
 

@@ -7,7 +7,56 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-Nothing yet - see [v1.0.1](#101---2025-01-23) for latest release.
+Nothing yet - see [v1.1.0](#110---2025-10-29) for latest release.
+
+## [1.1.0] - 2025-10-29
+
+### Added
+
+**New Features:**
+- ✅ Inbox Placement Test endpoints - Test where your emails land across different ESPs
+  - `createPlacementTest()` - Create new inbox placement test (100 credits)
+  - `getPlacementTest()` - Get placement test results with detailed breakdown
+- ✅ Support for optional webhook notifications when placement tests complete
+- ✅ Automatic credit refund (100 credits) if no emails are detected in placement test
+
+**API Coverage:**
+- Updated from 11 to **13 API endpoints** (complete coverage)
+- Added 9 new TypeScript types for placement test functionality:
+  - `PlacementTestStatus` - Test status ('running' | 'complete')
+  - `PlacementLocation` - Email placement result (inbox, spam, category, waiting, missing)
+  - `PlacementTestESP` - Email service provider (google, yahoo, outlook, zoho, other)
+  - `PlacementTestAccountType` - Account type (personal, professional)
+  - `CreatePlacementTestRequest` - Request parameters (optional name and webhookUrl)
+  - `CreatePlacementTestResponse` - Test creation response with tracking code
+  - `PlacementTestRecipient` - Individual recipient placement details
+  - `PlacementTestSummary` - Summary percentages of placement results
+  - `PlacementTestResponse` - Complete test results with recipients and summary
+
+**Error Handling:**
+- ✅ New `PlacementTestNotFoundError` class for 404 errors on placement tests
+- ✅ Type guard `isPlacementTestNotFoundError()` for type-safe error handling
+- Updated from 13 to **14 error classes**
+
+**Testing:**
+- ✅ Added 10 comprehensive unit tests for placement test endpoints
+- Updated from 85 to **95 unit tests**
+- All tests passing with 100% coverage of new functionality
+
+**Documentation:**
+- ✅ Complete README section for Inbox Placement Test with examples
+- ✅ Detailed workflow explanation (create → send → poll → results)
+- ✅ Credit cost and refund policy documentation
+- ✅ Example code for both test creation and result polling
+- ✅ Updated API reference table with new endpoints
+
+### Changed
+
+**Documentation Updates:**
+- Updated feature count: 11 → 13 API endpoints
+- Updated error count: 13 → 14 error classes
+- Updated test count: 85 → 95 unit tests
+- Added placement test to Table of Contents
 
 ## [1.0.1] - 2025-01-23
 
@@ -129,6 +178,8 @@ Nothing yet - see [v1.0.1](#101---2025-01-23) for latest release.
 - `Fixed` for any bug fixes
 - `Security` in case of vulnerabilities
 
-[Unreleased]: https://github.com/EmailListVerify-com/emaillistverify-sdk-js/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/EmailListVerify-com/emaillistverify-sdk-js/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/EmailListVerify-com/emaillistverify-sdk-js/releases/tag/v1.1.0
+[1.0.1]: https://github.com/EmailListVerify-com/emaillistverify-sdk-js/releases/tag/v1.0.1
 [1.0.0]: https://github.com/EmailListVerify-com/emaillistverify-sdk-js/releases/tag/v1.0.0
 [0.1.2]: https://github.com/EmailListVerify-com/emaillistverify-sdk-js/releases/tag/v0.1.2
