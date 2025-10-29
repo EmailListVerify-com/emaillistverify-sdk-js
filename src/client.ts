@@ -17,6 +17,9 @@ import type {
   DownloadMaillistOptions,
   DownloadMaillistResponse,
   CreditsResponse,
+  CreatePlacementTestRequest,
+  CreatePlacementTestResponse,
+  PlacementTestResponse,
 } from './types';
 import { HttpClient, createHttpClient } from './utils/http';
 import { ValidationError } from './utils/errors';
@@ -378,6 +381,67 @@ export class EmailListVerifyClient {
    */
   async getCredits(): Promise<CreditsResponse> {
     const response = await this.http.get<CreditsResponse>('/api/credits');
+    return response.data;
+  }
+
+  // ========================================================================
+  // Inbox Placement Test
+  // ========================================================================
+
+  /**
+   * Create an inbox placement test
+   * Tests where your emails land across different ESPs (Gmail, Yahoo, Outlook, etc.)
+   *
+   * Credits: 100 per test
+   *
+   * @param request - Optional test configuration (name and webhook URL)
+   * @returns Test details including tracking code and seed email addresses
+   *
+   * @example
+   * ```typescript
+   * const test = await client.createPlacementTest({
+   *   name: 'Q1 2025 Campaign Test',
+   *   webhookUrl: 'https://yourapp.com/webhooks/placement-test'
+   * });
+   * console.log(test.code); // "ELV-A1B2C3D4E5"
+   * console.log(test.emails); // Array of seed emails to send to
+   * ```
+   */
+  async createPlacementTest(
+    request?: CreatePlacementTestRequest
+  ): Promise<CreatePlacementTestResponse> {
+    const response = await this.http.post<CreatePlacementTestResponse>(
+      '/api/inboxPlacementTests',
+      request || {}
+    );
+    return response.data;
+  }
+
+  /**
+   * Get placement test results
+   * Retrieves current status and results of a placement test
+   *
+   * @param code - Tracking code returned from createPlacementTest (e.g., "ELV-A1B2C3D4E5")
+   * @returns Complete test results including placement breakdown and summary
+   *
+   * @example
+   * ```typescript
+   * const results = await client.getPlacementTest('ELV-A1B2C3D4E5');
+   * console.log(results.status); // 'running' | 'complete'
+   * console.log(results.summary.inbox); // Percentage in inbox
+   * console.log(results.summary.spam); // Percentage in spam
+   *
+   * // Poll every 30-60 seconds while status is 'running'
+   * while (results.status === 'running') {
+   *   await sleep(60000); // Wait 60 seconds
+   *   results = await client.getPlacementTest(code);
+   * }
+   * ```
+   */
+  async getPlacementTest(code: string): Promise<PlacementTestResponse> {
+    this.validateRequired(code, 'code');
+
+    const response = await this.http.get<PlacementTestResponse>(`/api/inboxPlacementTests/${code}`);
     return response.data;
   }
 
