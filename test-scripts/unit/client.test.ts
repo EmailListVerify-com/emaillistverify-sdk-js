@@ -490,6 +490,216 @@ describe('EmailListVerifyClient', () => {
     });
   });
 
+  describe('createPlacementTest()', () => {
+    const mockResponse = {
+      id: '507f1f77bcf86cd799439011',
+      code: 'ELV-A1B2C3D4E5',
+      name: 'Q1 2025 Campaign Test',
+      emails: ['test1@gmail.com', 'test2@yahoo.com', 'test3@outlook.com'],
+      status: 'running' as const,
+      createdAt: '2025-01-27T16:55:00.000Z',
+    };
+
+    it('should create placement test with name and webhookUrl', async () => {
+      (global.fetch as any).mockResolvedValueOnce({
+        ok: true,
+        status: 201,
+        headers: new Headers({ 'content-type': 'application/json' }),
+        json: async () => mockResponse,
+      });
+
+      const result = await client.createPlacementTest({
+        name: 'Q1 2025 Campaign Test',
+        webhookUrl: 'https://example.com/webhook',
+      });
+
+      expect(result).toEqual(mockResponse);
+      expect(result.code).toBe('ELV-A1B2C3D4E5');
+      expect(result.status).toBe('running');
+      expect(result.emails).toHaveLength(3);
+    });
+
+    it('should create placement test with name only', async () => {
+      (global.fetch as any).mockResolvedValueOnce({
+        ok: true,
+        status: 201,
+        headers: new Headers({ 'content-type': 'application/json' }),
+        json: async () => mockResponse,
+      });
+
+      const result = await client.createPlacementTest({
+        name: 'Test Campaign',
+      });
+
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('should create placement test with webhookUrl only', async () => {
+      (global.fetch as any).mockResolvedValueOnce({
+        ok: true,
+        status: 201,
+        headers: new Headers({ 'content-type': 'application/json' }),
+        json: async () => mockResponse,
+      });
+
+      const result = await client.createPlacementTest({
+        webhookUrl: 'https://example.com/webhook',
+      });
+
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('should create placement test with no parameters', async () => {
+      (global.fetch as any).mockResolvedValueOnce({
+        ok: true,
+        status: 201,
+        headers: new Headers({ 'content-type': 'application/json' }),
+        json: async () => mockResponse,
+      });
+
+      const result = await client.createPlacementTest();
+
+      expect(result).toEqual(mockResponse);
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+    });
+
+    it('should create placement test with undefined parameter', async () => {
+      (global.fetch as any).mockResolvedValueOnce({
+        ok: true,
+        status: 201,
+        headers: new Headers({ 'content-type': 'application/json' }),
+        json: async () => mockResponse,
+      });
+
+      const result = await client.createPlacementTest(undefined);
+
+      expect(result).toEqual(mockResponse);
+    });
+  });
+
+  describe('getPlacementTest()', () => {
+    const mockResponse = {
+      userId: 123,
+      name: 'Q1 2025 Campaign Test',
+      code: 'ELV-A1B2C3D4E5',
+      status: 'complete' as const,
+      sender: 'campaigns@example.com',
+      recipients: [
+        {
+          email: 'test1@gmail.com',
+          esp: 'google' as const,
+          type: 'personal' as const,
+          placement: 'inbox' as const,
+          foundAt: '2025-01-27T17:02:15.000Z',
+        },
+        {
+          email: 'test2@yahoo.com',
+          esp: 'yahoo' as const,
+          type: 'personal' as const,
+          placement: 'spam' as const,
+          foundAt: '2025-01-27T17:02:20.000Z',
+        },
+        {
+          email: 'test3@outlook.com',
+          esp: 'outlook' as const,
+          type: 'professional' as const,
+          placement: 'waiting' as const,
+          foundAt: null,
+        },
+      ],
+      summary: {
+        inbox: 33,
+        promotions: 0,
+        spam: 33,
+        waiting: 34,
+        missing: 0,
+      },
+      createdAt: '2025-01-27T16:55:00.000Z',
+      updatedAt: '2025-01-27T17:05:00.000Z',
+    };
+
+    it('should get placement test results', async () => {
+      (global.fetch as any).mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        headers: new Headers({ 'content-type': 'application/json' }),
+        json: async () => mockResponse,
+      });
+
+      const result = await client.getPlacementTest('ELV-A1B2C3D4E5');
+
+      expect(result).toEqual(mockResponse);
+      expect(result.code).toBe('ELV-A1B2C3D4E5');
+      expect(result.status).toBe('complete');
+      expect(result.recipients).toHaveLength(3);
+      expect(result.summary.inbox).toBe(33);
+    });
+
+    it('should get placement test with running status', async () => {
+      const runningResponse = {
+        ...mockResponse,
+        status: 'running' as const,
+        sender: null,
+        summary: {
+          inbox: 0,
+          promotions: 0,
+          spam: 0,
+          waiting: 100,
+          missing: 0,
+        },
+        updatedAt: null,
+      };
+
+      (global.fetch as any).mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        headers: new Headers({ 'content-type': 'application/json' }),
+        json: async () => runningResponse,
+      });
+
+      const result = await client.getPlacementTest('ELV-A1B2C3D4E5');
+
+      expect(result.status).toBe('running');
+      expect(result.sender).toBeNull();
+      expect(result.summary.waiting).toBe(100);
+    });
+
+    it('should handle recipients with null foundAt for waiting/missing', async () => {
+      (global.fetch as any).mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        headers: new Headers({ 'content-type': 'application/json' }),
+        json: async () => mockResponse,
+      });
+
+      const result = await client.getPlacementTest('ELV-A1B2C3D4E5');
+
+      const waitingRecipient = result.recipients.find((r) => r.placement === 'waiting');
+      expect(waitingRecipient?.foundAt).toBeNull();
+
+      const foundRecipients = result.recipients.filter((r) => r.foundAt !== null);
+      expect(foundRecipients).toHaveLength(2);
+    });
+
+    it('should throw ValidationError for empty code', async () => {
+      await expect(client.getPlacementTest('')).rejects.toThrow(ValidationError);
+    });
+
+    it('should throw NotFoundError for non-existent test', async () => {
+      (global.fetch as any).mockResolvedValueOnce({
+        ok: false,
+        status: 404,
+        headers: new Headers({ 'content-type': 'application/json' }),
+        json: async () => ({
+          statusCode: 404,
+          message: 'Placement test not found: ELV-INVALID123',
+        }),
+      });
+
+      await expect(client.getPlacementTest('ELV-INVALID123')).rejects.toThrow(NotFoundError);
+    });
+  });
+
   describe('Error Handling', () => {
     it('should throw AuthenticationError on 401', async () => {
       (global.fetch as any).mockResolvedValueOnce({

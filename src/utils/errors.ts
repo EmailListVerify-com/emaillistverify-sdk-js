@@ -140,6 +140,22 @@ export class MaillistNotFoundError extends NotFoundError {
 }
 
 /**
+ * Placement test not found error
+ * HTTP 404
+ */
+export class PlacementTestNotFoundError extends NotFoundError {
+  constructor(code?: string, response?: ApiErrorResponse) {
+    super(
+      code ? `Placement test not found: ${code}` : 'Placement test not found',
+      'PlacementTest',
+      code,
+      response
+    );
+    this.name = 'PlacementTestNotFoundError';
+  }
+}
+
+/**
  * Bad request error - Invalid input
  * HTTP 400
  */
@@ -295,6 +311,9 @@ export function createErrorFromResponse(
       ) {
         return new MaillistNotFoundError('unknown', apiResponse);
       }
+      if (message.toLowerCase().includes('placement test')) {
+        return new PlacementTestNotFoundError(undefined, apiResponse);
+      }
       return new NotFoundError(message, undefined, undefined, apiResponse);
     }
 
@@ -338,4 +357,8 @@ export function isNetworkError(error: unknown): error is NetworkError {
 
 export function isValidationError(error: unknown): error is ValidationError {
   return error instanceof ValidationError;
+}
+
+export function isPlacementTestNotFoundError(error: unknown): error is PlacementTestNotFoundError {
+  return error instanceof PlacementTestNotFoundError;
 }
